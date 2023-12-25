@@ -1,18 +1,18 @@
-use std::env;
-use std::fs::File;
-use std::io::Write;
-use std::path::{Path, PathBuf};
-use std::process::Command;
+use std::{
+    env,
+    fs::File,
+    path::{Path, PathBuf},
+    process::Command,
+};
 
-use anyhow::{Context, Result};
-use csv::{ReaderBuilder, Trim, WriterBuilder};
-use serde::Deserialize;
-use serde::Serialize;
+use anyhow::{anyhow, Context, Result};
+use bincode::serialize_into;
+use csv::{ReaderBuilder, Trim};
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 struct Record {
     full_name: String,
-
     #[serde(default)]
     abbreviation_1: Option<String>,
     #[serde(default)]
@@ -21,6 +21,7 @@ struct Record {
     abbreviation_3: Option<String>,
 }
 
+#[derive(Clone, Copy)]
 enum Order {
     Dots,
     Dotless,
@@ -49,34 +50,35 @@ impl Order {
 
 fn main() -> Result<()> {
     let repo_dir = clone_repo()?;
-    let import_order = if cfg!(feature = "dot") {
-        Order::Dots
-    } else {
-        Order::Dotless
-    };
+    let import_order = determine_order();
     let journals = process_csv_files(&repo_dir, import_order)?;
-    let _output_filename = if cfg!(feature = "dot") {
-        "journalList_dots.csv"
-    } else {
-        "journalList_dotless.csv"
-    };
-    // write_journals_to_csv(&journals, output_filename)?;
-    write_journals_to_static_array(&journals)?;
+
+    let out_dir = env::var("OUT_DIR").context("OUT_DIR environment variable not found")?;
+    let dest_path = Path::new(&out_dir).join("generated_journals.bin");
+    write_journals_to_bincode(&journals, &dest_path)?;
+
+    if cfg!(feature = "csv") {
+        let output_filename = construct_output_filename(&out_dir, import_order);
+        write_journals_to_csv(&journals, &output_filename)?;
+    }
+
     Ok(())
 }
 
 fn clone_repo() -> Result<PathBuf> {
-    let out_dir = env::var("CARGO_MANIFEST_DIR")?;
+    let out_dir = env::var("OUT_DIR").context("OUT_DIR environment variable not found")?;
     let repo_dir = Path::new(&out_dir).join("abbrv.jabref.org");
     if !repo_dir.exists() {
         Command::new("git")
             .args([
                 "clone",
                 "https://github.com/JabRef/abbrv.jabref.org.git",
-                repo_dir.to_str().unwrap(),
+                repo_dir
+                    .to_str()
+                    .ok_or_else(|| anyhow!("Failed to convert repo path to string"))?,
             ])
             .status()
-            .with_context(|| format!("Failed to clone the repository into {:?}", repo_dir))?;
+            .context("Failed to clone the repository")?;
     }
     Ok(repo_dir)
 }
@@ -106,29 +108,33 @@ fn read_csv(file_path: &Path) -> Result<Vec<Record>> {
         .context("Failed to read and deserialize CSV records")
 }
 
-fn write_journals_to_csv(journals: &[Record], output_csv_filename: &str) -> Result<()> {
-    let mut wtr = WriterBuilder::new().from_writer(File::create(output_csv_filename)?);
+fn write_journals_to_csv(journals: &[Record], output_csv_filename: &Path) -> Result<()> {
+    let mut wtr = csv::Writer::from_path(output_csv_filename)?;
     for journal in journals {
         wtr.serialize(journal)?;
     }
     wtr.flush()?;
-    println!("CSV written to {}", output_csv_filename);
     Ok(())
 }
 
-fn write_journals_to_static_array(journals: &[Record]) -> Result<()> {
-    let mut file = File::create("src/static_journals.rs")?;
-    writeln!(file, "static JOURNALS: &[JournalRecord] = &[")?;
-    for journal in journals {
-        writeln!(
-            file,
-            "    JournalRecord {{ name: {:?}, abbr_1: {:?}, abbr_2: {:?}, abbr_3: {:?} }},",
-            journal.full_name,
-            journal.abbreviation_1,
-            journal.abbreviation_2,
-            journal.abbreviation_3
-        )?;
-    }
-    writeln!(file, "];")?;
+fn write_journals_to_bincode(journals: &[Record], output_path: &Path) -> Result<()> {
+    let file = File::create(output_path)?;
+    serialize_into(file, journals)?;
     Ok(())
+}
+
+fn determine_order() -> Order {
+    if cfg!(feature = "dot") {
+        Order::Dots
+    } else {
+        Order::Dotless
+    }
+}
+
+fn construct_output_filename(out_dir: &str, import_order: Order) -> PathBuf {
+    let filename = match import_order {
+        Order::Dots => "journalList_dots.csv",
+        Order::Dotless => "journalList_dotless.csv",
+    };
+    Path::new(out_dir).join(filename)
 }

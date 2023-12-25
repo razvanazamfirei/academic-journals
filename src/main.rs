@@ -1,7 +1,7 @@
 mod cli;
 use crate::cli::Cli;
+use academic_journals::{get_abbreviation, get_full_name};
 use clap::Parser;
-use rust_journals::{get_abbreviation, get_full_name};
 
 fn main() {
     let cli: Cli = Cli::parse();

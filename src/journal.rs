@@ -1,7 +1,8 @@
-#[derive(Debug, Clone)]
-pub struct JournalRecord {
-    pub name: &'static str,
-    pub abbr_1: Option<&'static str>,
-    pub abbr_2: Option<&'static str>,
-    pub abbr_3: Option<&'static str>,
+use serde::Deserialize;
+#[derive(Debug, Deserialize, Clone)]
+pub struct Journal {
+    pub name: String,
+    pub abbr_1: Option<String>,
+    pub abbr_2: Option<String>,
+    pub abbr_3: Option<String>,
 }

@@ -3,6 +3,18 @@
 version = 3
 
 [[package]]
+name = "academic-journals"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "bincode",
+ "clap",
+ "csv",
+ "lazy_static",
+ "serde",
+]
+
+[[package]]
 name = "anstream"
 version = "0.6.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -55,6 +67,15 @@ name = "anyhow"
 version = "1.0.75"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a4668cab20f66d8d020e1fbc0ebe47217433c1b6c8f2040faf858554e394ace6"
+
+[[package]]
+name = "bincode"
+version = "1.3.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b1f45e9417d87227c7a56d22e471c6206462cba514c7590c09aff4cf6d1ddcad"
+dependencies = [
+ "serde",
+]
 
 [[package]]
 name = "clap"
@@ -163,17 +184,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5267fca4496028628a95160fc423a33e8b2e6af8a5302579e322e4b520293cae"
 dependencies = [
  "proc-macro2",
-]
-
-[[package]]
-name = "rust-journals"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "clap",
- "csv",
- "lazy_static",
- "serde",
 ]
 
 [[package]]

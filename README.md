@@ -27,7 +27,7 @@ Add `academic-journals` to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-academic-journals = "0.1.0"
+academic-journals = "0.1.1"
 ```
 
 In your Rust file:

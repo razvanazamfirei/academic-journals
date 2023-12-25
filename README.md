@@ -2,7 +2,7 @@
 
 [![Crates.io](https://img.shields.io/crates/v/academic-journals.svg)](https://crates.io/crates/academic-journals)
 [![Docs.rs](https://docs.rs/academic-journals/badge.svg)](https://docs.rs/academic-journals)
-[![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](
+[![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
 
 
 > :warning: **DISCLAIMER: This crate is currently a work in progress (WIP).** It is not yet recommended for use in production environments. Features and functionality may change, and certain parts may not be fully implemented or tested.
@@ -63,5 +63,3 @@ Contributions are welcome! Please feel free to submit a pull request.
 ## License
 
 This project is licensed under the Apache 2.0 license. See the [LICENSE](LICENSE) file for more details.
-
-Certainly! Adding a disclaimer, especially for work-in-progress (WIP) projects, is important to set the right expectations for users. Here's how you can modify the README to include a prominent WIP disclaimer:

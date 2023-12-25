@@ -1,0 +1,25 @@
+[package]
+name = "rust-journals" # the name of the package
+edition = "2021"
+version = "0.1.0"
+exclude = [
+    "abbrv.jabref.org/*",
+    "src/static_journals.rs",
+    "*.csv",
+]
+
+[dependencies]
+csv = "1.3.0"
+serde = { version = "1.0.193", features = ["derive"] }
+anyhow = "1.0.75"
+clap = { version = "4.4.11", features = ["derive"]}
+lazy_static = "1.4.0"
+
+[features]
+dot = []
+dotless = []
+
+[build-dependencies]
+csv = "1.3.0"
+serde = { version = "1.0.193", features = ["derive"] }
+anyhow = "1.0.75"

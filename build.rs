@@ -49,16 +49,28 @@ impl Order {
 }
 
 fn main() -> Result<()> {
-    let repo_dir = clone_repo()?;
-    let import_order = determine_order();
-    let journals = process_csv_files(&repo_dir, import_order)?;
-
     let out_dir = env::var("OUT_DIR").context("OUT_DIR environment variable not found")?;
-    let dest_path = Path::new(&out_dir).join("generated_journals.bin");
-    write_journals_to_bincode(&journals, &dest_path)?;
+    let mut journals = Vec::new();
+
+    if cfg!(feature = "online") {
+        let repo_dir = clone_repo()?;
+        let import_order = determine_order();
+        journals = process_csv_files(&repo_dir, import_order)?;
+
+        let dest_path = Path::new(&out_dir).join("generated_journals.bin");
+        write_journals_to_bincode(&journals, &dest_path)?;
+    }
 
     if cfg!(feature = "csv") {
-        let output_filename = construct_output_filename(&out_dir, import_order);
+        if journals.is_empty() {
+            // Load journals from the pre-generated binary file located in the resources directory
+            let bin_path = Path::new(&env::var("CARGO_MANIFEST_DIR")?)
+                .join("resources")
+                .join("generated_journals.bin");
+            journals = load_journals_from_bincode(&bin_path)?;
+        }
+
+        let output_filename = construct_output_filename(&out_dir, determine_order());
         write_journals_to_csv(&journals, &output_filename)?;
     }
 
@@ -94,6 +106,12 @@ fn process_csv_files(repo_dir: &Path, import_order: Order) -> Result<Vec<Record>
         })
         .collect::<Result<Vec<_>, _>>()
         .map(|v| v.into_iter().flatten().collect())
+}
+
+fn load_journals_from_bincode(bin_path: &Path) -> Result<Vec<Record>> {
+    let file = File::open(bin_path).context("Failed to open the binary file")?;
+    bincode::deserialize_from(file)
+        .context("Failed to deserialize the journals from the binary file")
 }
 
 fn read_csv(file_path: &Path) -> Result<Vec<Record>> {

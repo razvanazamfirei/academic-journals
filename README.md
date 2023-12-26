@@ -5,15 +5,19 @@
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
 
 
-> :warning: **DISCLAIMER: This crate is currently a work in progress (WIP).** It is not yet recommended for use in production environments. Features and functionality may change, and certain parts may not be fully implemented or tested.
+> :warning: **DISCLAIMER: This crate is currently a work in progress (WIP).** It is not yet recommended for use in
+production environments. Features and functionality may change, and certain parts may not be fully implemented or
+tested.
 
-`academic-journals` is a Rust library for managing and accessing journal abbreviations and full names. It's designed to efficiently handle a large dataset of journal entries and provides functionalities to retrieve either the abbreviation from a full journal name or vice versa.
+`academic-journals` is a Rust library for managing and accessing journal abbreviations and full names. It's designed to
+efficiently handle a large dataset of journal entries and provides functionalities to retrieve either the abbreviation
+from a full journal name or vice versa.
 
 ## Acknowledgments
 
-This crate makes use of data from abbrv.jabref.org provided by JabRef. The journal abbreviation data is released under the CC0 1.0 Universal (CC0 1.0) Public Domain Dedication. We gratefully acknowledge their work and contributions to the academic community.
-
-
+This crate makes use of data from abbrv.jabref.org provided by JabRef. The journal abbreviation data is released under
+the CC0 1.0 Universal (CC0 1.0) Public Domain Dedication. We gratefully acknowledge their work and contributions to the
+academic community.
 
 ## Features
 
@@ -36,15 +40,15 @@ In your Rust file:
 use rust_journals::{get_abbreviation, get_full_name};
 
 fn main() {
-	let full_name = "Journal of Artificial Intelligence Research";
-	if let Some(abbreviation) = get_abbreviation(full_name) {
-		println!("Abbreviation for {}: {}", full_name, abbreviation);
-	}
+    let full_name = "Journal of Artificial Intelligence Research";
+    if let Some(abbreviation) = get_abbreviation(full_name) {
+        println!("Abbreviation for {}: {}", full_name, abbreviation);
+    }
 
-	let abbreviation = "JAIR";
-	if let Some(name) = get_full_name(abbreviation) {
-		println!("Full name for {}: {}", abbreviation, name);
-	}
+    let abbreviation = "JAIR";
+    if let Some(name) = get_full_name(abbreviation) {
+        println!("Full name for {}: {}", abbreviation, name);
+    }
 }
 ```
 
